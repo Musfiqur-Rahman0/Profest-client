@@ -6,7 +6,7 @@ import React from "react";
 import { BsFillArrowUpRightCircleFill } from "react-icons/bs";
 
 const Header = () => {
-  return <Container className="mt-5 py-5 flex items-center justify-between bg-white px-5 rounded-xl fixed w-full  left-1/2 -translate-x-1/2 ">
+  return <Container className="z-50 mt-5 py-5 flex items-center justify-between bg-white px-5 rounded-xl fixed w-full  left-1/2 -translate-x-1/2 ">
       <Logo/>
       <NavItems/>
       <div className="flex items-center gap-4">

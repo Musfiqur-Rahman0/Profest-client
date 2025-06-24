@@ -2,6 +2,8 @@ import { clsx } from "clsx";
 import { BriefcaseBusiness, PackageSearch, Truck, Warehouse } from "lucide-react";
 import { twMerge } from "tailwind-merge"
 import serviceImg1 from "../assets/delivery-van.png"
+import safeDelivary from "../assets/safe-delivery.png"
+import liveTracking from "../assets/live-tracking.png"
 export function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
@@ -68,3 +70,27 @@ export const services = [
     icon: serviceImg1
   },
 ]
+
+export  const keyFeatures = [
+  {
+    id: "feature-1",
+    title: "Live Parcel Tracking",
+    description:
+      "Stay updated in real-time with our live parcel tracking feature. From pick-up to delivery, monitor your shipment’s journey and get instant status updates for complete peace of mind.",
+    image: liveTracking,
+  },
+  {
+    id: "feature-2",
+    title: "100% Safe Delivery",
+    description:
+      "We ensure your parcels are handled with the utmost care and delivered securely to their destination. Our reliable process guarantees safe and damage-free delivery every time.",
+    image: safeDelivary,
+  },
+  {
+    id: "feature-3",
+    title: "24/7 Call Center Support",
+    description:
+      "Our dedicated support team is available around the clock to assist you with any questions, updates, or delivery concerns—anytime you need us.",
+    image: safeDelivary
+  }
+];

@@ -5,18 +5,23 @@ import React from "react";
 import HeroSection from "@/components/Home/HeroSection/HeroSection";
 import HowItWorks from "@/components/Home/HowitworksSection/HowItWorks";
 import OurServicesSection from "@/components/Home/OurServices/OurServiceSection";
+import SponsersSection from "@/components/Home/Sponsers/SponsersSections";
+import FeaturesCard from "@/components/Home/keyFeaturesSection/FeaturesCard";
+import KeyFeatures from "@/components/Home/keyFeaturesSection/KeyFeatures";
 
 const Home = () => {
 
   
   
   return (
-    <Container className="py-8">
+    <Container className="py-8 space-y-20">
     <HeroSection/>
-     <div className="my-7 rounded-2xl"> 
+     <div className=" rounded-2xl"> 
        <HowItWorks/>
      </div>
      <OurServicesSection/>
+     <SponsersSection/>
+     <KeyFeatures/>
     </Container>
   );
 };
