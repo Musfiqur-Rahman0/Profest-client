@@ -1,12 +1,8 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import {Link} from "react-router"
-import {
-  CircleCheckIcon,
-  CircleHelpIcon,
-  CircleIcon,
-} from "lucide-react"
+import * as React from "react";
+import { Link } from "react-router";
+import { CircleCheckIcon, CircleHelpIcon, CircleIcon } from "lucide-react";
 
 import {
   NavigationMenu,
@@ -16,7 +12,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu"
+} from "@/components/ui/navigation-menu";
 
 // List of components for the menu
 const components = [
@@ -55,7 +51,7 @@ const components = [
     description:
       "A popup that displays information related to an element when the element receives keyboard focus or the mouse hovers over it.",
   },
-]
+];
 
 // Main component
 export function NavItems() {
@@ -116,18 +112,18 @@ export function NavItems() {
         {/* Docs Direct Link */}
         <NavigationMenuItem>
           <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-            <Link href="/docs">Docs</Link>
+            <Link to="/covarage">Covarage</Link>
           </NavigationMenuLink>
         </NavigationMenuItem>
 
         {/* List Section */}
         <NavigationMenuItem>
-          <NavigationMenuTrigger>List</NavigationMenuTrigger>
-          <NavigationMenuContent>
+          {/* <NavigationMenuTrigger>List</NavigationMenuTrigger> */}
+          {/* <NavigationMenuContent>
             <ul className="grid w-[300px] gap-4">
               <li>
                 <NavigationMenuLink asChild>
-                  <Link href="#">
+                  <Link to={"/addParcel"}>
                     <div className="font-medium">Components</div>
                     <div className="text-muted-foreground">
                       Browse all components in the library.
@@ -152,11 +148,14 @@ export function NavItems() {
                 </NavigationMenuLink>
               </li>
             </ul>
-          </NavigationMenuContent>
+          </NavigationMenuContent> */}
+          <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+            <Link to="/addParcel">Add Parcel</Link>
+          </NavigationMenuLink>
         </NavigationMenuItem>
 
         {/* Simple Section */}
-        <NavigationMenuItem>
+        {/* <NavigationMenuItem>
           <NavigationMenuTrigger>Simple</NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid w-[200px] gap-4">
@@ -173,7 +172,7 @@ export function NavItems() {
               </li>
             </ul>
           </NavigationMenuContent>
-        </NavigationMenuItem>
+        </NavigationMenuItem> */}
 
         {/* With Icon Section */}
         <NavigationMenuItem>
@@ -205,7 +204,7 @@ export function NavItems() {
         </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>
-  )
+  );
 }
 
 // Helper subcomponent
@@ -221,5 +220,5 @@ function ListItem({ title, children, href, ...props }) {
         </Link>
       </NavigationMenuLink>
     </li>
-  )
+  );
 }
