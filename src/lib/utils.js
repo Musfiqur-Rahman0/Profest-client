@@ -94,3 +94,12 @@ export  const keyFeatures = [
     image: safeDelivary
   }
 ];
+
+
+export const getTrackingId = () => {
+
+  const prefix = "TRK";
+  const random = Math.random().toString(36).substr(2, 6).toUpperCase(); // e.g., 'A1B2C3'
+  const time = Date.now().toString(36).toUpperCase().slice(-4);         // last 4 chars of timestamp
+  return `${prefix}-${random}${time}`;
+}

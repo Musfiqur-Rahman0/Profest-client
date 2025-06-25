@@ -21,9 +21,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { getTrackingId } from "@/lib/utils";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLoaderData } from "react-router";
+import Swal from "sweetalert2";
 
 // Assuming these Shadcn UI components are available from your project's components/ui directory.
 const AddParcel = () => {
@@ -32,6 +34,7 @@ const AddParcel = () => {
   const [regions, setRegions] = useState([]);
   const [coveredArea, setCoveredArea]  = useState([])
   // const [currentRegion, setCurrentRegion]  = useState("Dhaka")
+
   const form = useForm({
     // resolver: zodResolver(formSchema), // Integrate Zod for validation
     defaultValues: {
@@ -62,31 +65,67 @@ const AddParcel = () => {
   // console.log(selectedRegion)
   // console.log(parcelType);
 
-  const onSubmit = (data) => {
-    // In a real application, you would send this data to an API or process it further.
-    console.log("Form submitted successfully! Here is the data:", data);
-    // You should replace this alert with a more user-friendly UI notification (e.g., a toast, modal).
-    // alert('Parcel details submitted successfully! Check the console for the data.');
-    // Using a custom message box for demonstration instead of alert().
-    // For this example, we'll just log to console and simulate success.
-    const messageBox = document.createElement("div");
-    messageBox.className =
-      "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
-    messageBox.innerHTML = `
-      <div class="bg-white p-6 rounded-lg shadow-xl text-center max-w-sm w-full">
-        <h3 class="text-xl font-bold mb-4 text-green-600">Success!</h3>
-        <p class="mb-6 text-gray-700">Parcel details submitted successfully! Check your browser's console for the data.</p>
-        <button id="closeMessageBox" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200">
-          Close
-        </button>
-      </div>
-    `;
-    document.body.appendChild(messageBox);
+  const senderCenter = form.watch("senderRegion");
+  const receiverCenter = form.watch("receiverRegion");
+  console.log(senderCenter, receiverCenter)
 
-    document.getElementById("closeMessageBox").onclick = () => {
-      document.body.removeChild(messageBox);
-    };
+  const onSubmit = (data) => {
+  const { parcelType, weight  } = data;
+
+    // console.log(parce)
+
+  const deliveryType = senderCenter === receiverCenter ? "Within City" : "Outside City";
+  console.log(deliveryType)
+  // --- Calculate cost ---
+  let cost = 0;
+  let breakdown = '';
+  if (parcelType === "document") {
+    cost = deliveryType === "Within City" ? 60 : 80;
+    breakdown = `document (${deliveryType}) = ৳${cost}`;
+  } else if (parcelType === "non-document") {
+    if (weight <= 3) {
+      cost = deliveryType === "Within City" ? 110 : 150;
+      breakdown = `non-document (≤ 3kg) - ${deliveryType} = ৳${cost}`;
+    } else {
+      const extraKg = Math.ceil(weight - 3);
+      const extraCost = extraKg * 40;
+      if (deliveryType === "Within City") {
+        cost = 110 + extraCost;
+        breakdown = `non-document (> 3kg) - Within City = ৳110 + ৳${extraCost} (for ${extraKg} extra kg)`;
+      } else {
+        cost = 150 + extraCost + 40; // 40 extra for outside city
+        breakdown = `non-document (> 3kg) - Outside City = ৳150 + ৳${extraCost} (for ${extraKg} extra kg) + ৳40 (extra)`;
+      }
+    }
+  }
+
+  // --- Create parcel object ---
+  const newParcel = {
+    ...data,
+    tracking_id: getTrackingId(),
+    addedBy: "musfiqurrhaman6@gmail.com",
+    addedOn: new Date().toISOString(),
+    deliveryCost: cost,
   };
+
+  console.log(newParcel);
+
+  // --- Show SweetAlert2 popup ---
+  Swal.fire({
+    title: 'Parcel Submitted!',
+    icon: 'success',
+    html: `
+      <p><strong>Tracking ID:</strong> ${newParcel.tracking_id}</p>
+      <p><strong>Delivery Type:</strong> ${deliveryType}</p>
+      <p><strong>Parcel Type:</strong> ${parcelType}</p>
+      <p><strong>Weight:</strong> ${weight} kg</p>
+      <p class="mt-2"><strong>Cost Breakdown:</strong><br>${breakdown}</p>
+      <p class="mt-2 text-lg"><strong>Total Cost: ৳${cost}</strong></p>
+    `,
+    confirmButtonText: 'Close',
+    confirmButtonColor: '#3085d6',
+  });
+};
 
   const fetchRegion = async () => {
     try {
@@ -115,7 +154,7 @@ const AddParcel = () => {
   })
   }, [selectedRegion, warehousesData])
 
-console.log(coveredArea)
+// console.log(coveredArea)
 
 
 
@@ -189,28 +228,28 @@ console.log(coveredArea)
                                   <FormControl>
                                     <RadioGroupItem
                                       value="document"
-                                      id="parcelTypeDocument"
+                                      id="parcelTypedocument"
                                     />
                                   </FormControl>
                                   <FormLabel
-                                    htmlFor="parcelTypeDocument"
+                                    htmlFor="parcelTypedocument"
                                     className="font-normal text-gray-800 cursor-pointer"
                                   >
-                                    Document
+                                    document
                                   </FormLabel>
                                 </FormItem>
                                 <FormItem className="flex items-center space-x-3 space-y-0 cursor-pointer">
                                   <FormControl>
                                     <RadioGroupItem
                                       value="non-document"
-                                      id="parcelTypeNonDocument"
+                                      id="parcelTypeNondocument"
                                     />
                                   </FormControl>
                                   <FormLabel
-                                    htmlFor="parcelTypeNonDocument"
+                                    htmlFor="parcelTypeNondocument"
                                     className="font-normal text-gray-800 cursor-pointer"
                                   >
-                                    Non-Document
+                                    non-document
                                   </FormLabel>
                                 </FormItem>
                               </RadioGroup>
@@ -513,11 +552,24 @@ console.log(coveredArea)
                               Warehouse
                             </FormLabel>
                             <FormControl>
-                              <Input
-                                placeholder="e.g., Local Pick-up Point"
-                                {...field}
-                                className="rounded-md focus:ring-blue-500 focus:border-blue-500"
-                              />
+                               <Select
+                              value={field.value}
+                              onValueChange={field.onChange}
+                              >
+                                <SelectTrigger className="w-full">
+                                  <SelectValue placeholder="Select a Warehouse" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectGroup>
+                                    <SelectLabel>Select a Warehouse</SelectLabel>
+                                    {coveredArea?.map((area, idx) => (
+                                      <SelectItem key={idx} value={area}>
+                                        {area}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectGroup>
+                                </SelectContent>
+                              </Select>
                             </FormControl>
                             {form.formState.errors.receiverWarehouse && (
                               <p className="text-red-500 text-sm mt-1">
@@ -538,12 +590,25 @@ console.log(coveredArea)
                             <FormLabel className="text-gray-700 font-medium">
                               Region
                             </FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="e.g., Khulna, Sylhet"
-                                {...field}
-                                className="rounded-md focus:ring-blue-500 focus:border-blue-500"
-                              />
+                             <FormControl>
+                              <Select
+                              value={field.value}
+                              onValueChange={field.onChange}
+                              >
+                                <SelectTrigger className="w-full">
+                                  <SelectValue placeholder="Select a Region" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectGroup>
+                                    <SelectLabel>Select a region</SelectLabel>
+                                    {regions?.map((region, idx) => (
+                                      <SelectItem key={idx} value={region}>
+                                        {region}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectGroup>
+                                </SelectContent>
+                              </Select>
                             </FormControl>
                             {form.formState.errors.receiverRegion && (
                               <p className="text-red-500 text-sm mt-1">
@@ -617,3 +682,6 @@ console.log(coveredArea)
 };
 
 export default AddParcel;
+
+
+ 
