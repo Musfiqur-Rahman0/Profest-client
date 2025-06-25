@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import useAxiosSecuire from "@/Hooks/useAxiosSecuire";
 import { getTrackingId } from "@/lib/utils";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -29,10 +30,10 @@ import Swal from "sweetalert2";
 
 // Assuming these Shadcn UI components are available from your project's components/ui directory.
 const AddParcel = () => {
-
   const warehousesData = useLoaderData();
   const [regions, setRegions] = useState([]);
-  const [coveredArea, setCoveredArea]  = useState([])
+  const [coveredArea, setCoveredArea] = useState([]);
+  const axiosSecuire = useAxiosSecuire();
   // const [currentRegion, setCurrentRegion]  = useState("Dhaka")
 
   const form = useForm({
@@ -58,63 +59,56 @@ const AddParcel = () => {
   const parcelType = form.watch("parcelType");
   const selectedRegion = form.watch("senderRegion");
 
-
   // console.log(warehousesData);
 
- 
   // console.log(selectedRegion)
   // console.log(parcelType);
 
   const senderCenter = form.watch("senderRegion");
   const receiverCenter = form.watch("receiverRegion");
-  console.log(senderCenter, receiverCenter)
+  // console.log(senderCenter, receiverCenter)
 
   const onSubmit = (data) => {
-  const { parcelType, weight  } = data;
+    const { parcelType, weight } = data;
 
-    // console.log(parce)
+    const deliveryType =
+      senderCenter === receiverCenter ? "Within City" : "Outside City";
 
-  const deliveryType = senderCenter === receiverCenter ? "Within City" : "Outside City";
-  console.log(deliveryType)
-  // --- Calculate cost ---
-  let cost = 0;
-  let breakdown = '';
-  if (parcelType === "document") {
-    cost = deliveryType === "Within City" ? 60 : 80;
-    breakdown = `document (${deliveryType}) = ৳${cost}`;
-  } else if (parcelType === "non-document") {
-    if (weight <= 3) {
-      cost = deliveryType === "Within City" ? 110 : 150;
-      breakdown = `non-document (≤ 3kg) - ${deliveryType} = ৳${cost}`;
-    } else {
-      const extraKg = Math.ceil(weight - 3);
-      const extraCost = extraKg * 40;
-      if (deliveryType === "Within City") {
-        cost = 110 + extraCost;
-        breakdown = `non-document (> 3kg) - Within City = ৳110 + ৳${extraCost} (for ${extraKg} extra kg)`;
+    let cost = 0;
+    let breakdown = "";
+
+    if (parcelType === "document") {
+      cost = deliveryType === "Within City" ? 60 : 80;
+      breakdown = `Document (${deliveryType}) = ৳${cost}`;
+    } else if (parcelType === "non-document") {
+      if (weight <= 3) {
+        cost = deliveryType === "Within City" ? 110 : 150;
+        breakdown = `Non-document (≤ 3kg) - ${deliveryType} = ৳${cost}`;
       } else {
-        cost = 150 + extraCost + 40; // 40 extra for outside city
-        breakdown = `non-document (> 3kg) - Outside City = ৳150 + ৳${extraCost} (for ${extraKg} extra kg) + ৳40 (extra)`;
+        const extraKg = Math.ceil(weight - 3);
+        const extraCost = extraKg * 40;
+        if (deliveryType === "Within City") {
+          cost = 110 + extraCost;
+          breakdown = `Non-document (> 3kg) - Within City = ৳110 + ৳${extraCost} (for ${extraKg} extra kg)`;
+        } else {
+          cost = 150 + extraCost + 40; // 40 extra for outside city
+          breakdown = `Non-document (> 3kg) - Outside City = ৳150 + ৳${extraCost} (for ${extraKg} extra kg) + ৳40 (extra charge)`;
+        }
       }
     }
-  }
 
-  // --- Create parcel object ---
-  const newParcel = {
-    ...data,
-    tracking_id: getTrackingId(),
-    addedBy: "musfiqurrhaman6@gmail.com",
-    addedOn: new Date().toISOString(),
-    deliveryCost: cost,
-  };
+    const newParcel = {
+      ...data,
+      tracking_id: getTrackingId(),
+      addedBy: "musfiqurrhaman6@gmail.com",
+      addedOn: new Date().toISOString(),
+      deliveryCost: cost,
+    };
 
-  console.log(newParcel);
-
-  // --- Show SweetAlert2 popup ---
-  Swal.fire({
-    title: 'Parcel Submitted!',
-    icon: 'success',
-    html: `
+    Swal.fire({
+      title: "Confirm Parcel Details",
+      icon: "info",
+      html: `
       <p><strong>Tracking ID:</strong> ${newParcel.tracking_id}</p>
       <p><strong>Delivery Type:</strong> ${deliveryType}</p>
       <p><strong>Parcel Type:</strong> ${parcelType}</p>
@@ -122,10 +116,29 @@ const AddParcel = () => {
       <p class="mt-2"><strong>Cost Breakdown:</strong><br>${breakdown}</p>
       <p class="mt-2 text-lg"><strong>Total Cost: ৳${cost}</strong></p>
     `,
-    confirmButtonText: 'Close',
-    confirmButtonColor: '#3085d6',
-  });
-};
+      showCancelButton: true,
+      confirmButtonText: "Proceed to Checkout",
+      cancelButtonText: "Continue Editing",
+      confirmButtonColor: "#28a745",
+      cancelButtonColor: "#6c757d",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Send to server
+        axiosSecuire.post("/parcels", newParcel).then((res) => {
+          if (res?.data?.insertedId) {
+            Swal.fire({
+              icon: "success",
+              title: "Redirecting...",
+              text: "Your parcel has been submitted. Redirecting to checkout soon...",
+              confirmButtonText: "OK",
+            });
+          }
+          // TODO: Redirect to checkout
+          // navigate("/checkout");
+        });
+      }
+    });
+  };
 
   const fetchRegion = async () => {
     try {
@@ -141,22 +154,20 @@ const AddParcel = () => {
     fetchRegion();
   }, []);
 
-  useEffect(()=> {
-     setCoveredArea(()=> {
-    const matchArea = warehousesData.find(area => 
-      selectedRegion.toLowerCase() === area?.city?.toLowerCase()
-    );
-    if(matchArea){
-      setCoveredArea(matchArea.covered_area)
-    }else{
-      setCoveredArea(null)
-    }
-  })
-  }, [selectedRegion, warehousesData])
+  useEffect(() => {
+    setCoveredArea(() => {
+      const matchArea = warehousesData.find(
+        (area) => selectedRegion.toLowerCase() === area?.city?.toLowerCase()
+      );
+      if (matchArea) {
+        setCoveredArea(matchArea.covered_area);
+      } else {
+        setCoveredArea(null);
+      }
+    });
+  }, [selectedRegion, warehousesData]);
 
-// console.log(coveredArea)
-
-
+  // console.log(coveredArea)
 
   return (
     <Container>
@@ -373,16 +384,18 @@ const AddParcel = () => {
                               Warehouse
                             </FormLabel>
                             <FormControl>
-                               <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
+                              <Select
+                                value={field.value}
+                                onValueChange={field.onChange}
                               >
                                 <SelectTrigger className="w-full">
                                   <SelectValue placeholder="Select a Warehouse" />
                                 </SelectTrigger>
                                 <SelectContent>
                                   <SelectGroup>
-                                    <SelectLabel>Select a Warehouse</SelectLabel>
+                                    <SelectLabel>
+                                      Select a Warehouse
+                                    </SelectLabel>
                                     {coveredArea?.map((area, idx) => (
                                       <SelectItem key={idx} value={area}>
                                         {area}
@@ -410,8 +423,8 @@ const AddParcel = () => {
                             </FormLabel>
                             <FormControl>
                               <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
+                                value={field.value}
+                                onValueChange={field.onChange}
                               >
                                 <SelectTrigger className="w-full">
                                   <SelectValue placeholder="Select a Region" />
@@ -552,16 +565,18 @@ const AddParcel = () => {
                               Warehouse
                             </FormLabel>
                             <FormControl>
-                               <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
+                              <Select
+                                value={field.value}
+                                onValueChange={field.onChange}
                               >
                                 <SelectTrigger className="w-full">
                                   <SelectValue placeholder="Select a Warehouse" />
                                 </SelectTrigger>
                                 <SelectContent>
                                   <SelectGroup>
-                                    <SelectLabel>Select a Warehouse</SelectLabel>
+                                    <SelectLabel>
+                                      Select a Warehouse
+                                    </SelectLabel>
                                     {coveredArea?.map((area, idx) => (
                                       <SelectItem key={idx} value={area}>
                                         {area}
@@ -590,10 +605,10 @@ const AddParcel = () => {
                             <FormLabel className="text-gray-700 font-medium">
                               Region
                             </FormLabel>
-                             <FormControl>
+                            <FormControl>
                               <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
+                                value={field.value}
+                                onValueChange={field.onChange}
                               >
                                 <SelectTrigger className="w-full">
                                   <SelectValue placeholder="Select a Region" />
@@ -682,6 +697,3 @@ const AddParcel = () => {
 };
 
 export default AddParcel;
-
-
- 
