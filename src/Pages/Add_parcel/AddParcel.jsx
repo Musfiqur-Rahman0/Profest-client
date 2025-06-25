@@ -11,13 +11,27 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useLoaderData } from "react-router";
 
 // Assuming these Shadcn UI components are available from your project's components/ui directory.
-
 const AddParcel = () => {
+
+  const warehousesData = useLoaderData();
+  const [regions, setRegions] = useState([]);
+  const [coveredArea, setCoveredArea]  = useState([])
+  // const [currentRegion, setCurrentRegion]  = useState("Dhaka")
   const form = useForm({
     // resolver: zodResolver(formSchema), // Integrate Zod for validation
     defaultValues: {
@@ -38,9 +52,15 @@ const AddParcel = () => {
       receiverInstructions: "",
     },
   });
-
   const parcelType = form.watch("parcelType");
-  console.log(parcelType);
+  const selectedRegion = form.watch("senderRegion");
+
+
+  // console.log(warehousesData);
+
+ 
+  // console.log(selectedRegion)
+  // console.log(parcelType);
 
   const onSubmit = (data) => {
     // In a real application, you would send this data to an API or process it further.
@@ -68,12 +88,43 @@ const AddParcel = () => {
     };
   };
 
+  const fetchRegion = async () => {
+    try {
+      const res = await fetch("/data/division.json");
+      const region = await res.json();
+      setRegions(region);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchRegion();
+  }, []);
+
+  useEffect(()=> {
+     setCoveredArea(()=> {
+    const matchArea = warehousesData.find(area => 
+      selectedRegion.toLowerCase() === area?.city?.toLowerCase()
+    );
+    if(matchArea){
+      setCoveredArea(matchArea.covered_area)
+    }else{
+      setCoveredArea(null)
+    }
+  })
+  }, [selectedRegion, warehousesData])
+
+console.log(coveredArea)
+
+
+
   return (
     <Container>
       {/* // Main container for the form, ensuring it's centered and responsive */}
       <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4 sm:p-6 lg:p-8 font-inter">
         <div className="w-full ">
-          <Card className="rounded-xl shadow-2xl overflow-hidden border-none">
+          <Card className="rounded-xl shadow-2xl overflow-hidden border-none !pt-0">
             <CardHeader className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-t-xl p-6 sm:p-8">
               <CardTitle className="text-3xl sm:text-4xl font-extrabold text-center tracking-tight">
                 Parcel Delivery Form
@@ -96,6 +147,7 @@ const AddParcel = () => {
                       <FormField
                         control={form.control}
                         name="parcelName"
+                        rules={{ required: "Parcel Name is required" }}
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="text-gray-700 font-medium">
@@ -124,7 +176,7 @@ const AddParcel = () => {
                         name="parcelType"
                         render={({ field }) => (
                           <FormItem className="space-y-4">
-                            <FormLabel className="text-gray-700 font-medium">
+                            <FormLabel className="text-gray-700 font-medium !mb-0">
                               Parcel Type
                             </FormLabel>
                             <FormControl>
@@ -177,6 +229,9 @@ const AddParcel = () => {
                         <FormField
                           control={form.control}
                           name="weight"
+                          rules={{
+                            required: "Please type your document weight in kg",
+                          }}
                           render={({ field }) => (
                             <FormItem className="transition-all duration-300 ease-in-out">
                               <FormLabel className="text-gray-700 font-medium">
@@ -219,6 +274,7 @@ const AddParcel = () => {
                       <FormField
                         control={form.control}
                         name="senderName"
+                        rules={{ required: "Sender name is required" }}
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="text-gray-700 font-medium">
@@ -242,6 +298,9 @@ const AddParcel = () => {
                       <FormField
                         control={form.control}
                         name="senderContactNumber"
+                        rules={{
+                          required: "Sender contact number is required",
+                        }}
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="text-gray-700 font-medium">
@@ -275,11 +334,24 @@ const AddParcel = () => {
                               Warehouse
                             </FormLabel>
                             <FormControl>
-                              <Input
-                                placeholder="e.g., Main Distribution Hub"
-                                {...field}
-                                className="rounded-md focus:ring-blue-500 focus:border-blue-500"
-                              />
+                               <Select
+                              value={field.value}
+                              onValueChange={field.onChange}
+                              >
+                                <SelectTrigger className="w-full">
+                                  <SelectValue placeholder="Select a Warehouse" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectGroup>
+                                    <SelectLabel>Select a Warehouse</SelectLabel>
+                                    {coveredArea?.map((area, idx) => (
+                                      <SelectItem key={idx} value={area}>
+                                        {area}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectGroup>
+                                </SelectContent>
+                              </Select>
                             </FormControl>
                             {form.formState.errors.senderWarehouse && (
                               <p className="text-red-500 text-sm mt-1">
@@ -298,11 +370,24 @@ const AddParcel = () => {
                               Region
                             </FormLabel>
                             <FormControl>
-                              <Input
-                                placeholder="e.g., Dhaka, Chittagong"
-                                {...field}
-                                className="rounded-md focus:ring-blue-500 focus:border-blue-500"
-                              />
+                              <Select
+                              value={field.value}
+                              onValueChange={field.onChange}
+                              >
+                                <SelectTrigger className="w-full">
+                                  <SelectValue placeholder="Select a Region" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectGroup>
+                                    <SelectLabel>Select a region</SelectLabel>
+                                    {regions?.map((region, idx) => (
+                                      <SelectItem key={idx} value={region}>
+                                        {region}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectGroup>
+                                </SelectContent>
+                              </Select>
                             </FormControl>
                             {form.formState.errors.senderRegion && (
                               <p className="text-red-500 text-sm mt-1">
@@ -315,6 +400,7 @@ const AddParcel = () => {
                       <FormField
                         control={form.control}
                         name="senderAddress"
+                        rules={{ required: "Sender address is required" }}
                         render={({ field }) => (
                           <FormItem className="md:col-span-2">
                             <FormLabel className="text-gray-700 font-medium">
@@ -365,6 +451,9 @@ const AddParcel = () => {
                       <FormField
                         control={form.control}
                         name="receiverName"
+                        rules={{
+                          required: "Please give a name to send the percel",
+                        }}
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="text-gray-700 font-medium">
@@ -388,6 +477,9 @@ const AddParcel = () => {
                       <FormField
                         control={form.control}
                         name="receiverContactNumber"
+                        rules={{
+                          required: "Receiver phone number is required",
+                        }}
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="text-gray-700 font-medium">
@@ -464,6 +556,7 @@ const AddParcel = () => {
                       <FormField
                         control={form.control}
                         name="receiverAddress"
+                        rules={{ required: "Please provide receiver address." }}
                         render={({ field }) => (
                           <FormItem className="md:col-span-2">
                             <FormLabel className="text-gray-700 font-medium">
@@ -508,10 +601,8 @@ const AddParcel = () => {
                   {/* Submit Button */}
                   <Button
                     type="submit"
-                    className="w-full py-3 sm:py-4 text-lg sm:text-xl font-bold rounded-lg
-                             bg-gradient-to-r from-blue-600 to-indigo-700 text-white
-                             hover:from-blue-700 hover:to-indigo-800
-                             shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.005]"
+                    className="w-full !py-5 sm:py-4 text-lg sm:text-xl font-bold rounded-lg
+                           cursor-pointer  "
                   >
                     Submit Parcel Details
                   </Button>

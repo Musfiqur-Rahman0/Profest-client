@@ -33,6 +33,7 @@ const router = createBrowserRouter([
       },
       {
         path: "addParcel",
+          loader: () => fetch("/data/warehouses.json"),
         Component: AddParcel,
       },
     ],
