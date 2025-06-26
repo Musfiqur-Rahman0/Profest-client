@@ -6,6 +6,7 @@ import Contact from "@/Pages/Contact/Contact";
 import Covarage from "@/Pages/Covarage/Covarage";
 import ErrorPage from "@/Pages/Error/ErrorPage";
 import Home from "@/Pages/Home/Home";
+import MYparcels from "@/Pages/myparcels/MYparcels";
 
 import { createBrowserRouter } from "react-router";
 
@@ -42,7 +43,12 @@ const router = createBrowserRouter([
   {
     path: "/dashboard",
     element: <DashboardLayout />,
-    children: [],
+    children: [
+      {
+        path: "myparcels",
+        element: <MYparcels />,
+      },
+    ],
   },
 ]);
 
