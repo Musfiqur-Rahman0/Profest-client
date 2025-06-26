@@ -40,12 +40,12 @@ const data = {
   },
   teams: [
     {
-      name: "Acme Inc",
+      name: "Profest Inc",
       logo: GalleryVerticalEnd,
       plan: "Enterprise",
     },
     {
-      name: "Acme Corp.",
+      name: "Profest Corp.",
       logo: AudioWaveform,
       plan: "Startup",
     },

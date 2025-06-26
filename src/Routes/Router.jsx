@@ -2,11 +2,14 @@ import DashboardLayout from "@/Layouts/DashboardLayout";
 import Root from "@/Layouts/Root";
 import About from "@/Pages/About/About";
 import AddParcel from "@/Pages/Add_parcel/AddParcel";
+import BeArider from "@/Pages/beArider/BeArider";
 import Contact from "@/Pages/Contact/Contact";
 import Covarage from "@/Pages/Covarage/Covarage";
-import ErrorPage from "@/Pages/Error/ErrorPage";
+import ErrorPage from "@/Pages/errorpage/ErrorPage";
+
 import Home from "@/Pages/Home/Home";
 import MYparcels from "@/Pages/myparcels/MYparcels";
+import PricingCalculator from "@/Pages/pricingCalculator/PricingCalculator";
 
 import { createBrowserRouter } from "react-router";
 
@@ -29,6 +32,14 @@ const router = createBrowserRouter([
         Component: Contact,
       },
       {
+        path: "/be-a-rider",
+        Component: BeArider,
+      },
+      {
+        path: "/pircing",
+        Component: PricingCalculator,
+      },
+      {
         path: "covarage",
         loader: () => fetch("/data/warehouses.json"),
         Component: Covarage,
@@ -38,6 +49,10 @@ const router = createBrowserRouter([
         loader: () => fetch("/data/warehouses.json"),
         Component: AddParcel,
       },
+      {
+        path : "*",
+        Component : ErrorPage
+      }
     ],
   },
   {
