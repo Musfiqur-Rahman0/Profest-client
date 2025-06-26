@@ -1,3 +1,4 @@
+import DashboardLayout from "@/Layouts/DashboardLayout";
 import Root from "@/Layouts/Root";
 import About from "@/Pages/About/About";
 import AddParcel from "@/Pages/Add_parcel/AddParcel";
@@ -33,10 +34,15 @@ const router = createBrowserRouter([
       },
       {
         path: "addParcel",
-          loader: () => fetch("/data/warehouses.json"),
+        loader: () => fetch("/data/warehouses.json"),
         Component: AddParcel,
       },
     ],
+  },
+  {
+    path: "/dashboard",
+    element: <DashboardLayout />,
+    children: [],
   },
 ]);
 
