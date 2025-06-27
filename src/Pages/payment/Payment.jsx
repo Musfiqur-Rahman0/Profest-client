@@ -1,0 +1,16 @@
+import PaymentForm from "@/components/Dashboard/PaymentForm/PaymentForm";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import React from "react";
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUB_KEY);
+
+const Payment = () => {
+  return (
+    <Elements stripe={stripePromise}>
+      <PaymentForm />
+    </Elements>
+  );
+};
+
+export default Payment;

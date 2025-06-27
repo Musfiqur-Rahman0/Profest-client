@@ -23,6 +23,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import useAxiosSecuire from "@/Hooks/useAxiosSecuire";
 import { getTrackingId } from "@/lib/utils";
+import { reverseEasing } from "motion";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLoaderData } from "react-router";
@@ -69,7 +70,41 @@ const AddParcel = () => {
   // console.log(senderCenter, receiverCenter)
 
   const onSubmit = (data) => {
-    const { parcelType, weight } = data;
+    const {
+      parcelType,
+      weight,
+      senderName,
+      senderContactNumber,
+      senderWarehouse,
+      senderAddress,
+      senderRegion,
+      senderInstructions,
+      receiverName,
+      receiverContactNumber,
+      receiverWarehouse,
+      receiverAddress,
+      receiverRegion,
+      receiverInstructions,
+      ...rest
+    } = data;
+
+    const sender = {
+      name: senderName,
+      contactNumber: senderContactNumber,
+      warehouse: senderWarehouse,
+      address: senderAddress,
+      region: senderRegion,
+      instructions: senderInstructions,
+    };
+
+    const receiver = {
+      name: receiverName,
+      contactNumber: receiverContactNumber,
+      warehouse: receiverWarehouse,
+      address: receiverAddress,
+      region: receiverRegion,
+      instructions: receiverInstructions,
+    };
 
     const deliveryType =
       senderCenter === receiverCenter ? "Within City" : "Outside City";
@@ -98,7 +133,11 @@ const AddParcel = () => {
     }
 
     const newParcel = {
-      ...data,
+      ...rest,
+      parcelType,
+      weight,
+      sender,
+      receiver,
       tracking_id: getTrackingId(),
       addedBy: "musfiqurrhaman6@gmail.com",
       addedOn: new Date().toISOString(),
@@ -244,7 +283,7 @@ const AddParcel = () => {
                                   </FormControl>
                                   <FormLabel
                                     htmlFor="parcelTypedocument"
-                                    className="font-normal text-gray-800 cursor-pointer"
+                                    className="capitalize font-normal text-gray-800 cursor-pointer"
                                   >
                                     document
                                   </FormLabel>
@@ -258,7 +297,7 @@ const AddParcel = () => {
                                   </FormControl>
                                   <FormLabel
                                     htmlFor="parcelTypeNondocument"
-                                    className="font-normal text-gray-800 cursor-pointer"
+                                    className=" capitalize font-normal text-gray-800 cursor-pointer"
                                   >
                                     non-document
                                   </FormLabel>

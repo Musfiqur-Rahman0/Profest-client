@@ -9,6 +9,7 @@ import ErrorPage from "@/Pages/errorpage/ErrorPage";
 
 import Home from "@/Pages/Home/Home";
 import MYparcels from "@/Pages/myparcels/MYparcels";
+import Payment from "@/Pages/payment/Payment";
 import PricingCalculator from "@/Pages/pricingCalculator/PricingCalculator";
 
 import { createBrowserRouter } from "react-router";
@@ -50,9 +51,9 @@ const router = createBrowserRouter([
         Component: AddParcel,
       },
       {
-        path : "*",
-        Component : ErrorPage
-      }
+        path: "*",
+        Component: ErrorPage,
+      },
     ],
   },
   {
@@ -62,6 +63,10 @@ const router = createBrowserRouter([
       {
         path: "myparcels",
         element: <MYparcels />,
+      },
+      {
+        path: "payment/:id",
+        element: <Payment />,
       },
     ],
   },
