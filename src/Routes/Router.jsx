@@ -5,6 +5,7 @@ import AddParcel from "@/Pages/Add_parcel/AddParcel";
 import BeArider from "@/Pages/beArider/BeArider";
 import Contact from "@/Pages/Contact/Contact";
 import Covarage from "@/Pages/Covarage/Covarage";
+import PaymentsHistory from "@/Pages/Dashboard/PaymentsHistory";
 import ErrorPage from "@/Pages/errorpage/ErrorPage";
 
 import Home from "@/Pages/Home/Home";
@@ -65,8 +66,13 @@ const router = createBrowserRouter([
         element: <MYparcels />,
       },
       {
-        path: "payment/:id",
+        path: "payment/:parcelId",
         element: <Payment />,
+      },
+
+      {
+        path: "payments-history",
+        element: <PaymentsHistory />,
       },
     ],
   },

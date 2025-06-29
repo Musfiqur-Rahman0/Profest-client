@@ -67,8 +67,8 @@ const data = {
           url: "myparcels",
         },
         {
-          title: "Starred",
-          url: "#",
+          title: "Payments History",
+          url: "payments-history",
         },
         {
           title: "Settings",

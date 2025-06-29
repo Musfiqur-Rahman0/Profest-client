@@ -3,23 +3,27 @@ import useAxiosSecuire from "@/Hooks/useAxiosSecuire";
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
+import Swal from "sweetalert2";
 
 const PaymentForm = () => {
   const stripe = useStripe();
   const elements = useElements();
   const [errorMessage, setErrorMessage] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
   const axiosSecure = useAxiosSecuire();
-  const { id } = useParams();
+  const { parcelId } = useParams();
+
+  const navigate = useNavigate();
 
   const {
     isPending,
     data: parcelInfo = {},
     isError,
   } = useQuery({
-    queryKey: ["parcels", id],
+    queryKey: ["parcels", parcelId],
     queryFn: async () => {
-      const res = await axiosSecure.get(`/parcels/${id}`);
+      const res = await axiosSecure.get(`/parcels/${parcelId}`);
       return res.data;
     },
   });
@@ -35,45 +39,77 @@ const PaymentForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!stripe || !elements) {
-      return;
-    }
+    if (!stripe || !elements) return;
+    if (isProcessing) return;
 
     const card = elements.getElement(CardElement);
-    if (!card) {
-      return;
-    }
+    if (!card) return;
 
-    const { error, paymentMethod } = await stripe.createPaymentMethod({
-      type: "card",
-      card,
-    });
+    setIsProcessing(true);
 
-    if (error) {
-      console.log("[error]", error);
-      return setErrorMessage(error.message);
-    }
-
-    console.log("Payment method intentend-->", paymentMethod);
-
-    setErrorMessage(null);
-
-    const res = await axiosSecure.post("/payment-intent", {
-      amount: ammoutInCents,
-      currency: "usd",
-    });
-
-    const clientSecrect = res.data.clientSecret;
-    const { error: paymentConfirmError, paymentIntent } =
-      await stripe.confirmCardPayment(clientSecrect, {
-        payment_method: paymentMethod.id,
+    try {
+      const { error, paymentMethod } = await stripe.createPaymentMethod({
+        type: "card",
+        card,
       });
 
-    if (paymentConfirmError) {
-      return setErrorMessage(paymentConfirmError.message);
+      if (error) {
+        setErrorMessage(error.message);
+        return;
+      }
+
+      setErrorMessage(null);
+
+      const res = await axiosSecure.post("/payment-intent", {
+        amount: ammoutInCents,
+        currency: "usd",
+        parcelId,
+      });
+
+      const clientSecret = res.data.clientSecret;
+
+      const { error: paymentConfirmError, paymentIntent } =
+        await stripe.confirmCardPayment(clientSecret, {
+          payment_method: paymentMethod.id,
+        });
+
+      if (paymentConfirmError) {
+        setErrorMessage(paymentConfirmError.message);
+        return;
+      }
+
+      if (paymentIntent.status === "succeeded") {
+        const paymentData = {
+          parcelId,
+          email: "musfiqurrhaman6@gmail.com",
+          amount: ammout,
+          transactionId: paymentIntent.id,
+          paymentMethod: paymentIntent.payment_method_types,
+        };
+
+        const paymentRes = await axiosSecure.post("/payments", paymentData);
+
+        if (paymentRes.data.insertedId) {
+          await Swal.fire({
+            icon: "success",
+            title: "Payment Successful!",
+            html: `<strong>Transaction ID:</strong> <code>${paymentIntent.id}</code>`,
+            confirmButtonText: "Go to My Parcels",
+          });
+
+          navigate("/dashboard/myparcels");
+        } else {
+          setErrorMessage("Payment succeeded but failed to update backend.");
+        }
+      } else {
+        setErrorMessage("Payment did not succeed.");
+      }
+    } catch (err) {
+      console.error(err);
+      setErrorMessage("Something went wrong. Please try again.");
+    } finally {
+      setIsProcessing(false);
     }
-    console.log("after confimed payment intent", paymentIntent);
-    setErrorMessage(null);
   };
 
   // console.log(errorMessage);

@@ -103,14 +103,16 @@ const MYparcels = () => {
                 >
                   View
                 </Button>
-                <Button
-                  variant=""
-                  size="sm"
-                  className={"cursor-pointer bg-green-500 hover:bg-green-600"}
-                  onClick={() => handlePay(parcel._id)}
-                >
-                  Pay
-                </Button>
+                {parcel.status !== "Paid" && (
+                  <Button
+                    variant=""
+                    size="sm"
+                    className={"cursor-pointer bg-green-500 hover:bg-green-600"}
+                    onClick={() => handlePay(parcel._id)}
+                  >
+                    Pay
+                  </Button>
+                )}
                 <Button
                   variant="destructive"
                   size="sm"
