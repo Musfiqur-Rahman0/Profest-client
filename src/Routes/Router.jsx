@@ -1,11 +1,15 @@
+import AuthLayout from "@/Layouts/AuthLayout";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import Root from "@/Layouts/Root";
 import About from "@/Pages/About/About";
 import AddParcel from "@/Pages/Add_parcel/AddParcel";
+import Login from "@/Pages/authetication/Login";
+import Signup from "@/Pages/authetication/Signup";
 import BeArider from "@/Pages/beArider/BeArider";
 import Contact from "@/Pages/Contact/Contact";
 import Covarage from "@/Pages/Covarage/Covarage";
 import PaymentsHistory from "@/Pages/Dashboard/PaymentsHistory";
+import TrackParcel from "@/Pages/Dashboard/Track-parcel/TrackParcel";
 import ErrorPage from "@/Pages/errorpage/ErrorPage";
 
 import Home from "@/Pages/Home/Home";
@@ -73,6 +77,24 @@ const router = createBrowserRouter([
       {
         path: "payments-history",
         element: <PaymentsHistory />,
+      },
+      {
+        path: "track",
+        element: <TrackParcel />,
+      },
+    ],
+  },
+  {
+    path: "/",
+    Component: AuthLayout,
+    children: [
+      {
+        path: "login",
+        Component: Login,
+      },
+      {
+        path: "signup",
+        Component: Signup,
       },
     ],
   },

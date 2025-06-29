@@ -15,6 +15,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "./dropdown-menu";
+import { AuthContext } from "@/Context/AuthContext";
 // import {
 //   DropdownMenu,
 //   DropdownMenuContent,
@@ -36,6 +37,8 @@ export function TeamSwitcher({ teams }) {
   if (!activeTeam) {
     return null;
   }
+
+  const { user } = React.use(AuthContext);
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -46,7 +49,12 @@ export function TeamSwitcher({ teams }) {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                <activeTeam.logo className="size-4" />
+                {/* <activeTeam.logo className="size-4" /> */}
+                <img
+                  src={user?.photoURL}
+                  alt={user?.displayName}
+                  className="size-5"
+                />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{activeTeam.name}</span>
