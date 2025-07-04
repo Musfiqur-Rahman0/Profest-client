@@ -1,3 +1,6 @@
+import ApprovedRiders from "@/components/Dashboard/ApprovedRiders/ApprovedRiders";
+import PendingRiders from "@/components/Dashboard/PendingRiders/PendingRiders";
+import RejectedRiders from "@/components/Dashboard/RejectedRiders/RejectedRiders";
 import AuthLayout from "@/Layouts/AuthLayout";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import Root from "@/Layouts/Root";
@@ -39,6 +42,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/be-a-rider",
+        loader: () => fetch("/data/warehouses.json"),
         Component: BeArider,
       },
       {
@@ -81,6 +85,18 @@ const router = createBrowserRouter([
       {
         path: "track",
         element: <TrackParcel />,
+      },
+      {
+        path: "pending-riders",
+        element: <PendingRiders />,
+      },
+      {
+        path: "active-riders",
+        element: <ApprovedRiders />,
+      },
+      {
+        path: "rejected-riders",
+        element: <RejectedRiders />,
       },
     ],
   },

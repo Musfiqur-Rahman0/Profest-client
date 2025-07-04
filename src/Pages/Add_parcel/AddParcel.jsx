@@ -23,6 +23,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import useAxiosSecuire from "@/Hooks/useAxiosSecuire";
 import { getTrackingId } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
 import { reverseEasing } from "motion";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -60,14 +61,8 @@ const AddParcel = () => {
   const parcelType = form.watch("parcelType");
   const selectedRegion = form.watch("senderRegion");
 
-  // console.log(warehousesData);
-
-  // console.log(selectedRegion)
-  // console.log(parcelType);
-
   const senderCenter = form.watch("senderRegion");
   const receiverCenter = form.watch("receiverRegion");
-  // console.log(senderCenter, receiverCenter)
 
   const onSubmit = (data) => {
     const {
@@ -205,8 +200,6 @@ const AddParcel = () => {
       }
     });
   }, [selectedRegion, warehousesData]);
-
-  // console.log(coveredArea)
 
   return (
     <Container>

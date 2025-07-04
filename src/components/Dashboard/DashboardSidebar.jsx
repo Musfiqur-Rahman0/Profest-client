@@ -71,27 +71,27 @@ const data = {
           url: "payments-history",
         },
         {
-          title: "Settings",
+          title: "Track A Percel",
           url: "#",
         },
       ],
     },
     {
-      title: "Models",
+      title: "Riders",
       url: "#",
       icon: Bot,
       items: [
         {
-          title: "Genesis",
-          url: "#",
+          title: "Riders Applications",
+          url: "pending-riders",
         },
         {
-          title: "Explorer",
-          url: "#",
+          title: "Active Riders",
+          url: "active-riders",
         },
         {
-          title: "Quantum",
-          url: "#",
+          title: "Rejected Riders ",
+          url: "rejected-riders",
         },
       ],
     },
