@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import riderImg from "../../assets/agent-pending.png";
 import { useQuery } from "@tanstack/react-query";
@@ -18,6 +18,7 @@ import { useLoaderData } from "react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import useAxiosSecuire from "@/Hooks/useAxiosSecuire";
 import Swal from "sweetalert2";
+import { AuthContext } from "@/Context/AuthContext";
 
 // Optional: a small error text component
 const FormError = ({ message }) => (
@@ -39,6 +40,8 @@ const BeArider = () => {
   const [coveredArea, setCoveredArea] = useState([]);
   const warehousesData = useLoaderData();
   const axiosSecure = useAxiosSecuire();
+
+  const { user } = use(AuthContext);
 
   const {
     register,
@@ -123,6 +126,7 @@ const BeArider = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Input
+                  defaultValue={user?.displayName}
                   {...register("name", { required: "Name is required" })}
                   placeholder="Your Name"
                 />
@@ -140,6 +144,7 @@ const BeArider = () => {
 
               <div>
                 <Input
+                  defaultValue={user?.email}
                   {...register("email", {
                     required: "Email is required",
                     pattern: {

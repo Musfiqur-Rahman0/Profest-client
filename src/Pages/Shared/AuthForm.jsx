@@ -6,12 +6,14 @@ import { useNavigate, useLocation, Link } from "react-router";
 import axios from "axios";
 import useAuth from "@/Hooks/useAuth";
 import { FcGoogle } from "react-icons/fc";
+import useAxiosSecuire from "@/Hooks/useAxiosSecuire";
 
 const AuthForm = ({ isSignup }) => {
   const { signUp, login, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
+  const axiosSecure = useAxiosSecuire();
 
   const {
     register,
@@ -38,6 +40,17 @@ const AuthForm = ({ isSignup }) => {
         const photoURL = res.data.data.display_url;
 
         await signUp(data.email, data.password, data.first_name, photoURL);
+
+        const userInfo = {
+          email: data.email,
+          role: "user", // default role
+          created_at: new Date().toISOString(),
+          last_log_in: new Date().toISOString(),
+        };
+
+        // ✅ Store user in your DB.
+        await axiosSecure.post("/users", userInfo);
+
         navigate("/login");
       } catch (error) {
         console.error("Image upload failed:", error);

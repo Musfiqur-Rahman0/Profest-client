@@ -21,6 +21,7 @@ import Payment from "@/Pages/payment/Payment";
 import PricingCalculator from "@/Pages/pricingCalculator/PricingCalculator";
 
 import { createBrowserRouter } from "react-router";
+import PrivetRoute from "./PrivetRoute";
 
 const router = createBrowserRouter([
   {
@@ -43,7 +44,11 @@ const router = createBrowserRouter([
       {
         path: "/be-a-rider",
         loader: () => fetch("/data/warehouses.json"),
-        Component: BeArider,
+        element: (
+          <PrivetRoute>
+            <BeArider />
+          </PrivetRoute>
+        ),
       },
       {
         path: "/pircing",
