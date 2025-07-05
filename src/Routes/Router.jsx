@@ -22,6 +22,7 @@ import PricingCalculator from "@/Pages/pricingCalculator/PricingCalculator";
 
 import { createBrowserRouter } from "react-router";
 import PrivetRoute from "./PrivetRoute";
+import MakeAdmin from "@/components/Dashboard/makeAdmin/MakeAdmin";
 
 const router = createBrowserRouter([
   {
@@ -102,6 +103,10 @@ const router = createBrowserRouter([
       {
         path: "rejected-riders",
         element: <RejectedRiders />,
+      },
+      {
+        path: "make-admin",
+        element: <MakeAdmin />,
       },
     ],
   },

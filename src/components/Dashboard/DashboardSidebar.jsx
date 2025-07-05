@@ -101,8 +101,8 @@ const data = {
       icon: BookOpen,
       items: [
         {
-          title: "Introduction",
-          url: "#",
+          title: "Make Admin",
+          url: "make-admin",
         },
         {
           title: "Get Started",
